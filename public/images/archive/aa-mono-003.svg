@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 1000" width="640" height="1000">
+<rect width="100%" height="100%" fill="#efefef"/>
+<rect x="18" y="18" width="604" height="964" fill="none" stroke="#d7d7d7" stroke-width="2"/>
+<rect x="80" y="90" width="160" height="780" fill="#111"/><rect x="260" y="160" width="300" height="140" fill="#333"/><rect x="260" y="350" width="250" height="300" fill="#777"/>
+<text x="28" y="972" font-family="monospace" font-size="28" fill="#999">AA-MONO-003</text>
+</svg>

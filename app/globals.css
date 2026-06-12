@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background: #ffffff;
+  color: #050505;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #ffffff;
+  font-synthesis-weight: none;
+  text-rendering: geometricPrecision;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: #050505;
+}
+
+::selection {
+  background: #050505;
+  color: #ffffff;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  -webkit-user-drag: none;
+}

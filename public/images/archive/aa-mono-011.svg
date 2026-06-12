@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1000" width="1080" height="1000">
+<rect width="100%" height="100%" fill="#efefef"/>
+<rect x="18" y="18" width="1044" height="964" fill="none" stroke="#d7d7d7" stroke-width="2"/>
+<rect x="100" y="100" width="880" height="760" fill="#111"/><line x1="320" y1="100" x2="320" y2="860" stroke="#111" stroke-width="22"/><line x1="560" y1="100" x2="560" y2="860" stroke="#111" stroke-width="22"/><line x1="100" y1="360" x2="980" y2="360" stroke="#111" stroke-width="22"/><line x1="100" y1="610" x2="980" y2="610" stroke="#111" stroke-width="22"/>
+<text x="28" y="972" font-family="monospace" font-size="28" fill="#999">AA-MONO-011</text>
+</svg>
