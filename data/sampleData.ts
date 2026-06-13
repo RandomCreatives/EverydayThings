@@ -1,4 +1,4 @@
-import type { Photograph, PrintSize, Project } from '@/lib/types';
+import type { Photograph, Project } from '@/lib/types';
 
 export const printSizes: PrintSize[] = [
   { id: 'small',  label: 'Small',  dimensions: '30 × 40 cm', priceCents: 220000 },

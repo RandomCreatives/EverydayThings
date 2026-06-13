@@ -26,8 +26,16 @@ function trim(value: string | undefined) {
 }
 
 function normalizeSiteUrl() {
-  const explicit = trim(process.env.NEXT_PUBLIC_SITE_URL);
-  if (explicit) return explicit.replace(/\/$/, '');
+  let explicit = trim(process.env.NEXT_PUBLIC_SITE_URL);
+  if (explicit) {
+    // Robustness: strip leading = if accidentally pasted from env logs
+    explicit = explicit.replace(/^=/, '');
+    // Robustness: ensure protocol
+    if (!explicit.startsWith('http://') && !explicit.startsWith('https://')) {
+      explicit = `https://${explicit}`;
+    }
+    return explicit.replace(/\/$/, '');
+  }
 
   const vercelUrl = trim(process.env.VERCEL_URL);
   if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;

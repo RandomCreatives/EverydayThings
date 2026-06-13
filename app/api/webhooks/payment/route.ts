@@ -24,7 +24,11 @@ async function verifyChapaTransaction(txRef: string) {
   const env = getServerEnv();
 
   if (!isConfiguredSecret(env.chapaSecretKey)) {
-    return { ok: true, mode: 'mock' as const, metadata: { verification: 'mock-chapa-telebirr', tx_ref: txRef } };
+    return {
+      ok: true,
+      mode: 'mock' as const,
+      metadata: { verification: 'mock-chapa-telebirr', tx_ref: txRef } as Record<string, unknown>
+    };
   }
 
   const response = await fetch(`${env.chapaVerifyBaseUrl}/${encodeURIComponent(txRef)}`, {

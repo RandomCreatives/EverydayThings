@@ -17,10 +17,8 @@ export async function GET() {
     integrations: {
       supabaseRead: hasSupabaseReadEnv(env) ? 'configured' : 'fallback-sample-data',
       supabaseWrite: hasSupabaseWriteEnv(env) ? 'configured' : 'disabled',
-      stripe: isConfiguredSecret(env.stripeSecretKey, 'sk_') ? 'configured' : 'sandbox',
       chapa: isConfiguredSecret(env.chapaSecretKey) ? 'configured' : 'mock-verify',
-      contact: env.formspreeEndpoint || isConfiguredSecret(env.resendApiKey, 're_') ? 'configured' : 'local-log',
-      adminUpload: env.adminUploadPassword ? 'configured' : 'disabled'
+      contact: env.formspreeEndpoint || isConfiguredSecret(env.resendApiKey, 're_') ? 'configured' : 'local-log'
     }
   });
 }

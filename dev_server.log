@@ -1,0 +1,75 @@
+
+> minimalist-photo-portfolio-print-shop@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+ ✓ Ready in 1992ms
+ ○ Compiling /api/health ...
+ ✓ Compiled /api/health in 5.1s (299 modules)
+ GET /api/health 200 in 5635ms
+ ○ Compiling /archive ...
+ ✓ Compiled /archive in 6.1s (700 modules)
+ GET /archive 200 in 7466ms
+ GET /api/health 200 in 53ms
+ GET /api/health 200 in 15ms
+ GET /api/health 200 in 15ms
+ GET /api/health 200 in 15ms
+ GET /api/health 200 in 16ms
+ GET /api/health 200 in 16ms
+ GET /api/health 200 in 15ms
+ GET /api/health 200 in 19ms
+ GET /api/health 200 in 17ms
+ GET /api/health 200 in 16ms
+ GET /api/health 200 in 14ms
+ GET /api/health 200 in 14ms
+ GET /api/health 200 in 13ms
+ GET /api/health 200 in 12ms
+ GET /api/health 200 in 12ms
+ GET /api/health 200 in 21ms
+ GET /api/health 200 in 14ms
+ GET /api/health 200 in 12ms
+ GET /api/health 200 in 14ms
+ GET /api/health 200 in 13ms
+ GET /api/health 200 in 16ms
+ GET /api/health 200 in 15ms
+ GET /api/health 200 in 12ms
+ GET /api/health 200 in 13ms
+ GET /api/health 200 in 14ms
+ GET /api/health 200 in 12ms
+ GET /api/health 200 in 12ms
+ GET /api/health 200 in 13ms
+ GET /api/health 200 in 11ms
+ GET /api/health 200 in 17ms
+ GET /archive 200 in 150ms
+ GET /api/health 200 in 14ms
+ GET /archive 200 in 146ms
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+./node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+./node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
