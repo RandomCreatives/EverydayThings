@@ -12,8 +12,6 @@ type RuntimeEnv = {
   formspreeEndpoint?: string;
   resendApiKey?: string;
   contactToEmail?: string;
-  // Admin
-  adminUploadPassword?: string;
 };
 
 function trim(value: string | undefined) {
@@ -50,7 +48,6 @@ export function getServerEnv(): RuntimeEnv {
     formspreeEndpoint: trim(process.env.FORMSPREE_ENDPOINT),
     resendApiKey: trim(process.env.RESEND_API_KEY),
     contactToEmail: trim(process.env.CONTACT_TO_EMAIL),
-    adminUploadPassword: trim(process.env.ADMIN_UPLOAD_PASSWORD),
   };
 }
 

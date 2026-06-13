@@ -126,7 +126,6 @@ export async function getPhotographByCode(imageCode: string): Promise<Photograph
 // Print sizes remain local — simple reference data, no need for DB round-trip
 export const printSizes: PrintSize[] = samplePrintSizes;
 
-// Re-export sample arrays for components that still need synchronous access
-// (admin panel, static param generation). These are replaced by the async
-// functions above in all data-fetching paths.
+// Re-export sample arrays for static param generation (generateStaticParams).
+// All runtime data fetching uses the async functions above.
 export { samplePhotographs as photographs, sampleProjects as projects };
