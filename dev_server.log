@@ -61,3 +61,15 @@ Import trace for requested module:
 ./node_modules/process/browser.js
 ./node_modules/next/dist/compiled/next-devtools/index.js
 ./node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
