@@ -3,7 +3,7 @@ import { getServerEnv } from '@/lib/env';
 
 export async function StructuredData() {
   const env = getServerEnv();
-  const [projects, photographs] = await Promise.all([getProjects(), getPhotographs({ limit: 6 })]);
+  const [projects, photographs] = await Promise.all([getProjects(), getPhotographs()]);
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Person',
