@@ -110,7 +110,7 @@ export function MasonryArchive({ photographs }: Props) {
   return (
     <div className="flex gap-4 md:gap-6">
       {/* Left — expanded image + detail */}
-      <aside className="w-full md:w-[420px] lg:w-[480px] shrink-0 md:sticky md:top-[52px] md:max-h-[calc(100vh-60px)] md:overflow-y-auto">
+      <aside className="w-full md:w-[640px] lg:w-[760px] xl:w-[860px] shrink-0 md:sticky md:top-[52px] md:max-h-[calc(100vh-60px)] md:overflow-y-auto">
         <ExpandedImagePanel photo={selected} onClose={handleClose} />
       </aside>
 

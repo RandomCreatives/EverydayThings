@@ -136,9 +136,9 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
-      {/* Close */}
-      <div className="mb-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-gray-500">
+    <div className="flex flex-col">
+      {/* Close bar */}
+      <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-gray-500">
         <span>{photo.imageCode}</span>
         <button
           type="button"
@@ -150,119 +150,129 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
         </button>
       </div>
 
-      {/* Image */}
-      <div
-        className="relative w-full bg-gray-200"
-        style={{ aspectRatio: `${photo.aspectRatio}` }}
-      >
-        <Image
-          src={photo.imageUrl}
-          alt={photo.title}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          placeholder="blur"
-          blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
-          draggable={false}
-          onContextMenu={(e) => e.preventDefault()}
-          className="select-none object-cover"
-          priority
-        />
-      </div>
+      {/* Image + detail side by side */}
+      <div className="flex gap-5 items-start">
 
-      {/* Actions row */}
-      <div className="mt-4 flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.08em]">
-        {/* Like */}
-        <button
-          type="button"
-          onClick={handleLike}
-          className={`flex items-center gap-1 transition-colors ${liked ? 'text-black' : 'text-gray-400 hover:text-black'}`}
-          aria-label={liked ? 'Unlike' : 'Like'}
-        >
-          <span aria-hidden="true">{liked ? '♥' : '♡'}</span>
-          <span>{likes > 0 ? likes : ''}</span>
-        </button>
-
-        {/* Comment */}
-        <button
-          type="button"
-          onClick={toggleComments}
-          className="flex items-center gap-1 text-gray-400 hover:text-black transition-colors"
-          aria-label="Toggle comments"
-        >
-          <span aria-hidden="true">◎</span>
-          {comments.length > 0 && <span>{comments.length}</span>}
-        </button>
-
-        {/* Share */}
-        <button
-          type="button"
-          onClick={handleShare}
-          className="flex items-center gap-1 text-gray-400 hover:text-black transition-colors"
-          aria-label="Copy share link"
-        >
-          <span aria-hidden="true">↗</span>
-          <span>{shareCopied ? 'COPIED' : 'SHARE'}</span>
-        </button>
-      </div>
-
-      {/* Title + description */}
-      <div className="mt-4 border-t border-gray-200 pt-4">
-        <h2 className="font-mono text-[13px] uppercase tracking-[0.16em] text-black">
-          {photo.title}
-        </h2>
-        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-gray-500">
-          {photo.location}
-        </p>
-        {photo.description && (
-          <p className="mt-3 text-xs leading-relaxed text-gray-700">{photo.description}</p>
-        )}
-      </div>
-
-      {/* Want Print button */}
-      {photo.isPrintAvailable && (
-        <button
-          type="button"
-          onClick={() => openPrintDrawer(photo)}
-          className="mt-5 w-full bg-black py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white hover:bg-gray-800"
-        >
-          [ WANT PRINT ]
-        </button>
-      )}
-
-      {/* Comments section */}
-      {showComments && (
-        <div className="mt-5 border-t border-gray-200 pt-4">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-500">
-            COMMENTS
-          </p>
-          {comments.length === 0 && (
-            <p className="mb-3 text-xs text-gray-400">No comments yet.</p>
-          )}
-          <ul className="mb-4 grid gap-2">
-            {comments.map((c, i) => (
-              <li key={i} className="text-xs leading-relaxed text-gray-700 border-l-2 border-gray-200 pl-2">
-                {c}
-              </li>
-            ))}
-          </ul>
-          <form onSubmit={submitComment} className="flex gap-2">
-            <input
-              ref={commentInputRef}
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              placeholder="Add a comment..."
-              className="flex-1 border border-black bg-white px-3 py-2 font-mono text-[11px] outline-none"
-              maxLength={280}
+        {/* Left — image */}
+        <div className="w-[55%] shrink-0">
+          <div
+            className="relative w-full bg-gray-200"
+            style={{ aspectRatio: `${photo.aspectRatio}` }}
+          >
+            <Image
+              src={photo.imageUrl}
+              alt={photo.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 30vw"
+              placeholder="blur"
+              blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+              className="select-none object-cover"
+              priority
             />
-            <button
-              type="submit"
-              className="bg-black px-4 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-white hover:bg-gray-800"
-            >
-              POST
-            </button>
-          </form>
+          </div>
         </div>
-      )}
+
+        {/* Right — detail panel */}
+        <div className="flex flex-1 flex-col min-w-0">
+
+          {/* Actions */}
+          <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.08em]">
+            {/* Like */}
+            <button
+              type="button"
+              onClick={handleLike}
+              className={`flex items-center gap-1 transition-colors ${liked ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+              aria-label={liked ? 'Unlike' : 'Like'}
+            >
+              <span aria-hidden="true">{liked ? '♥' : '♡'}</span>
+              {likes > 0 && <span>{likes}</span>}
+            </button>
+
+            {/* Comment */}
+            <button
+              type="button"
+              onClick={toggleComments}
+              className="flex items-center gap-1 text-gray-400 hover:text-black transition-colors"
+              aria-label="Toggle comments"
+            >
+              <span aria-hidden="true">◎</span>
+              {comments.length > 0 && <span>{comments.length}</span>}
+            </button>
+
+            {/* Share */}
+            <button
+              type="button"
+              onClick={handleShare}
+              className="flex items-center gap-1 text-gray-400 hover:text-black transition-colors"
+              aria-label="Copy share link"
+            >
+              <span aria-hidden="true">↗</span>
+              <span>{shareCopied ? 'COPIED' : 'SHARE'}</span>
+            </button>
+          </div>
+
+          {/* Title + location + description */}
+          <div className="mt-4 border-t border-gray-200 pt-4">
+            <h2 className="font-mono text-[13px] uppercase tracking-[0.16em] text-black">
+              {photo.title}
+            </h2>
+            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-gray-500">
+              {photo.location}
+            </p>
+            {photo.description && (
+              <p className="mt-3 text-xs leading-relaxed text-gray-700">{photo.description}</p>
+            )}
+          </div>
+
+          {/* Want Print */}
+          {photo.isPrintAvailable && (
+            <button
+              type="button"
+              onClick={() => openPrintDrawer(photo)}
+              className="mt-5 w-full bg-black py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white hover:bg-gray-800"
+            >
+              [ WANT PRINT ]
+            </button>
+          )}
+
+          {/* Comments section */}
+          {showComments && (
+            <div className="mt-5 border-t border-gray-200 pt-4">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-gray-500">
+                COMMENTS
+              </p>
+              {comments.length === 0 && (
+                <p className="mb-3 text-xs text-gray-400">No comments yet.</p>
+              )}
+              <ul className="mb-4 grid gap-2">
+                {comments.map((c, i) => (
+                  <li key={i} className="border-l-2 border-gray-200 pl-2 text-xs leading-relaxed text-gray-700">
+                    {c}
+                  </li>
+                ))}
+              </ul>
+              <form onSubmit={submitComment} className="flex gap-2">
+                <input
+                  ref={commentInputRef}
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 border border-black bg-white px-3 py-2 font-mono text-[11px] outline-none"
+                  maxLength={280}
+                />
+                <button
+                  type="submit"
+                  className="bg-black px-4 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-white hover:bg-gray-800"
+                >
+                  POST
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
