@@ -2,74 +2,125 @@
  * POST /api/checkout
  *
  * Creates a Chapa checkout session for a fine art print order.
- * Supports all Chapa payment channels including Telebirr and CBEBirr.
+ * Supports all Chapa channels: Telebirr, CBEBirr, Amole, M-Pesa, bank.
  *
- * Body: { imageCode: string; sizeId: string; email?: string; name?: string }
+ * Body: {
+ *   imageCode: string
+ *   sizeId: string
+ *   fullName: string
+ *   email: string
+ *   phoneNumber: string        — Ethiopian format: 09xx, 07xx, +251xx, 251xx
+ *   locationDetails: string    — delivery address
+ * }
  *
  * Returns:
- *   { ok: true;  mode: "chapa";    url: string }   — redirect to Chapa hosted checkout
- *   { ok: true;  mode: "sandbox";  url: string }   — Chapa not configured, sandbox flow
- *   { ok: false; error: string }                   — validation error
+ *   { ok: true;  mode: "chapa";   checkoutUrl: string }
+ *   { ok: true;  mode: "sandbox"; checkoutUrl: string }
+ *   { ok: false; error: string }
  */
 
 import { NextResponse } from 'next/server';
-import { getPhotographByCode, printSizes } from '@/lib/data';
+import { getPhotographByCode } from '@/lib/data';
 import { getServerEnv, isConfiguredSecret } from '@/lib/env';
-import { getSupabaseServiceRole } from '@/lib/supabase';
+import { getPrintSize } from '@/lib/printSizes';
+import { getClientIp, rateLimit, rateLimitHeaders } from '@/lib/rateLimit';
 
 const CHAPA_API = 'https://api.chapa.co/v1';
+const ETH_PHONE_RE = /^(?:\+?251|0)[97]\d{8}$/;
 
 type CheckoutBody = {
-  imageCode?: string;
-  sizeId?: string;
-  email?: string;
-  name?: string;
+  imageCode?: unknown;
+  sizeId?: unknown;
+  fullName?: unknown;
+  email?: unknown;
+  phoneNumber?: unknown;
+  locationDetails?: unknown;
 };
 
 export async function POST(request: Request) {
+  // ── Rate limit: 10 checkout attempts per IP per 10 min ───────────────────
+  const ip = getClientIp(request);
+  const rl = rateLimit({ key: `checkout:${ip}`, limit: 10, windowMs: 10 * 60 * 1000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: 'Too many checkout attempts. Please wait a few minutes.' },
+      { status: 429, headers: rateLimitHeaders(rl) },
+    );
+  }
+
   const env = getServerEnv();
   const body = (await request.json().catch(() => null)) as CheckoutBody | null;
 
-  if (!body?.imageCode || !body?.sizeId) {
+  // ── Input validation ──────────────────────────────────────────────────────
+  const imageCode = typeof body?.imageCode === 'string' ? body.imageCode.trim() : '';
+  const sizeId = typeof body?.sizeId === 'string' ? body.sizeId.trim() : '';
+  const fullName = typeof body?.fullName === 'string' ? body.fullName.trim() : '';
+  const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const phoneNumber = typeof body?.phoneNumber === 'string' ? body.phoneNumber.trim() : '';
+  const locationDetails = typeof body?.locationDetails === 'string' ? body.locationDetails.trim() : '';
+
+  if (!imageCode || !sizeId) {
     return NextResponse.json({ ok: false, error: 'Missing imageCode or sizeId.' }, { status: 400 });
   }
+  if (fullName.length < 2) {
+    return NextResponse.json({ ok: false, error: 'Full name is required.' }, { status: 400 });
+  }
+  if (!email.includes('@')) {
+    return NextResponse.json({ ok: false, error: 'Valid email address is required.' }, { status: 400 });
+  }
+  if (!ETH_PHONE_RE.test(phoneNumber)) {
+    return NextResponse.json(
+      { ok: false, error: 'Enter a valid Ethiopian phone number (09xx, 07xx, or +251xx).' },
+      { status: 400 },
+    );
+  }
+  if (locationDetails.length < 10) {
+    return NextResponse.json({ ok: false, error: 'Delivery location details are required (min 10 characters).' }, { status: 400 });
+  }
 
-  const photo = await getPhotographByCode(body.imageCode);
-  const size = printSizes.find((s) => s.id === body.sizeId);
+  const photo = await getPhotographByCode(imageCode);
+  const size = getPrintSize(sizeId);
 
   if (!photo || !photo.isPrintAvailable || !size) {
     return NextResponse.json({ ok: false, error: 'Print is unavailable.' }, { status: 404 });
   }
 
-  // Amount in Birr (priceCents field repurposed as price in Birr × 100 for consistency)
-  const amountBirr = size.priceCents / 100;
-  const txRef = `ET-${photo.imageCode}-${size.id}-${Date.now()}`;
+  const amountEtb = Math.round(size.priceCents / 100);
+  const txRef = `ET-MONO-${Date.now()}`;
 
-  // ── Sandbox fallback when Chapa is not configured ─────────────────────────
-  if (!isConfiguredSecret(env.chapaSecretKey, 'CHASECK')) {
+  // ── Sandbox fallback ──────────────────────────────────────────────────────
+  if (!isConfiguredSecret(env.chapaSecretKey)) {
     return NextResponse.json({
       ok: true,
       mode: 'sandbox',
-      message: env.isProduction
-        ? 'Sandbox mode: configure CHAPA_SECRET_KEY to enable live payments.'
-        : 'Sandbox mode: add CHAPA_SECRET_KEY to .env.local for live Chapa checkout.',
-      url: `${env.siteUrl}/archive?checkout=sandbox&imageCode=${encodeURIComponent(photo.imageCode)}&size=${encodeURIComponent(size.id)}`,
+      message: 'Sandbox mode: configure CHAPA_SECRET_KEY to enable live payments.',
+      checkoutUrl: `${env.siteUrl}/archive?checkout=sandbox&imageCode=${encodeURIComponent(photo.imageCode)}&size=${encodeURIComponent(size.id)}`,
     });
   }
 
-  // ── Create Chapa checkout session ─────────────────────────────────────────
+  // ── Create Chapa session ──────────────────────────────────────────────────
+  const [firstName, ...rest] = fullName.split(' ');
+  const lastName = rest.join(' ') || '-';
+
   const chapaPayload = {
-    amount: amountBirr.toFixed(2),
+    amount: amountEtb.toFixed(2),
     currency: 'ETB',
-    email: body.email ?? 'guest@everydaythings.et',
-    first_name: body.name ?? 'Guest',
-    last_name: 'Buyer',
+    email,
+    first_name: firstName,
+    last_name: lastName,
+    phone_number: phoneNumber,
     tx_ref: txRef,
-    callback_url: `${env.siteUrl}/api/webhooks/chapa`,
+    callback_url: `${env.siteUrl}/api/webhooks/payment`,
     return_url: `${env.siteUrl}/archive?checkout=success&tx_ref=${encodeURIComponent(txRef)}`,
     customization: {
       title: 'Everyday Things — Fine Art Print',
       description: `${photo.title} · ${size.label} (${size.dimensions})`,
+    },
+    meta: {
+      imageCode: photo.imageCode,
+      sizeId: size.id,
+      customerPhone: phoneNumber,
+      deliveryAddress: locationDetails,
     },
   };
 
@@ -95,32 +146,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // ── Persist pending order in Supabase ─────────────────────────────────────
-  const sb = getSupabaseServiceRole();
-  if (sb) {
-    // Fire-and-forget — don't block the redirect on DB write
-    void fetch(`${env.supabaseUrl}/rest/v1/orders`, {
-      method: 'POST',
-      headers: {
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
-      },
-      body: JSON.stringify({
-        chapa_tx_ref: txRef,
-        chapa_checkout_url: chapaData.data.checkout_url,
-        photograph_id: photo.id,
-        image_code: photo.imageCode,
-        print_size_id: size.id,
-        amount_birr: amountBirr,
-        currency: 'ETB',
-        customer_email: body.email ?? null,
-        customer_name: body.name ?? null,
-        status: 'pending',
-      }),
-    });
-  }
-
-  return NextResponse.json({ ok: true, mode: 'chapa', url: chapaData.data.checkout_url });
+  return NextResponse.json({
+    ok: true,
+    mode: 'chapa',
+    checkoutUrl: chapaData.data.checkout_url,
+  });
 }

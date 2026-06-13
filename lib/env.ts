@@ -2,16 +2,22 @@ type RuntimeEnv = {
   nodeEnv: 'development' | 'test' | 'production';
   siteUrl: string;
   isProduction: boolean;
-  // Chapa (replaces Stripe)
+  // Chapa
   chapaSecretKey?: string;
   chapaWebhookSecret?: string;
+  chapaVerifyBaseUrl: string;
   // Supabase
   supabaseUrl?: string;
   supabaseServiceRoleKey?: string;
+  supabaseReceiptsBucket: string;
+  // Stripe (legacy / optional)
+  stripeSecretKey?: string;
   // Contact form
   formspreeEndpoint?: string;
   resendApiKey?: string;
   contactToEmail?: string;
+  // Admin
+  adminUploadPassword?: string;
 };
 
 function trim(value: string | undefined) {
@@ -43,11 +49,15 @@ export function getServerEnv(): RuntimeEnv {
     siteUrl: normalizeSiteUrl(),
     chapaSecretKey: trim(process.env.CHAPA_SECRET_KEY),
     chapaWebhookSecret: trim(process.env.CHAPA_WEBHOOK_SECRET),
+    chapaVerifyBaseUrl: trim(process.env.CHAPA_VERIFY_BASE_URL) ?? 'https://api.chapa.co/v1/transaction/verify',
     supabaseUrl: trim(process.env.NEXT_PUBLIC_SUPABASE_URL),
     supabaseServiceRoleKey: trim(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    supabaseReceiptsBucket: trim(process.env.SUPABASE_RECEIPTS_BUCKET) ?? 'receipts',
+    stripeSecretKey: trim(process.env.STRIPE_SECRET_KEY),
     formspreeEndpoint: trim(process.env.FORMSPREE_ENDPOINT),
     resendApiKey: trim(process.env.RESEND_API_KEY),
     contactToEmail: trim(process.env.CONTACT_TO_EMAIL),
+    adminUploadPassword: trim(process.env.ADMIN_UPLOAD_PASSWORD),
   };
 }
 
@@ -56,4 +66,12 @@ export function isConfiguredSecret(value: string | undefined, prefix?: string): 
   if (value.includes('replace_me')) return false;
   if (prefix && !value.startsWith(prefix)) return false;
   return true;
+}
+
+export function hasSupabaseReadEnv(env: RuntimeEnv): boolean {
+  return Boolean(env.supabaseUrl && !env.supabaseUrl.includes('replace-me'));
+}
+
+export function hasSupabaseWriteEnv(env: RuntimeEnv): boolean {
+  return hasSupabaseReadEnv(env) && Boolean(env.supabaseServiceRoleKey);
 }

@@ -53,25 +53,31 @@ on conflict (id) do nothing;
 -- ─────────────────────────────────────────────
 create table if not exists public.orders (
   id                  uuid primary key default gen_random_uuid(),
-  chapa_tx_ref        text not null unique,
-  chapa_checkout_url  text,
+  tx_ref              text not null unique,
+  provider            text not null default 'chapa_telebirr',
   photograph_id       uuid references public.photographs(id) on delete set null,
   image_code          text not null,
-  print_size_id       text not null,
-  amount_birr         numeric not null,
-  currency            text not null default 'ETB',
-  customer_email      text,
-  customer_name       text,
-  payment_method      text,          -- e.g. "telebirr", "cbebirr", "mpesa"
-  status              text not null default 'pending'
-                        check (status in ('pending', 'paid', 'failed', 'cancelled')),
-  chapa_verified_at   timestamptz,
+  size_id             text not null,
+  print_dimensions    text,
+  customer_name       text not null,
+  customer_email      text not null,
+  customer_phone      text not null,
+  delivery_address    text not null,
+  amount_etb          numeric not null,
+  currency            text not null default 'ETB' check (currency = 'ETB'),
+  payment_status      text not null default 'pending'
+                        check (payment_status in ('pending', 'paid', 'failed', 'cancelled')),
+  fulfillment_status  text not null default 'pending'
+                        check (fulfillment_status in ('pending', 'printing', 'shipped', 'delivered', 'cancelled')),
+  receipt_url         text,
+  metadata            jsonb not null default '{}',
   created_at          timestamptz not null default now()
 );
 
-create index if not exists orders_chapa_tx_ref_idx  on public.orders(chapa_tx_ref);
-create index if not exists orders_image_code_idx    on public.orders(image_code);
-create index if not exists orders_status_idx        on public.orders(status);
+create index if not exists orders_tx_ref_idx           on public.orders(tx_ref);
+create index if not exists orders_image_code_idx       on public.orders(image_code);
+create index if not exists orders_payment_status_idx   on public.orders(payment_status);
+create index if not exists orders_customer_email_idx   on public.orders(customer_email);
 
 -- ─────────────────────────────────────────────
 -- Row Level Security
@@ -115,3 +121,10 @@ create policy "Public photograph images are readable"
 create policy "Service role uploads photographs"
   on storage.objects for insert
   with check (bucket_id = 'photographs');
+
+-- ─────────────────────────────────────────────
+-- Storage bucket for PDF receipts (private)
+-- ─────────────────────────────────────────────
+insert into storage.buckets (id, name, public)
+values ('receipts', 'receipts', false)
+on conflict (id) do nothing;
