@@ -1,19 +1,14 @@
 /**
  * Data access layer.
- *
- * Tries Supabase first. If not configured (env vars missing / local dev),
- * falls back to the local sampleData arrays so the app always renders.
  */
 
-import type { Photograph, PrintSize, Project } from './types';
+import type { Photograph, Project } from './types';
 import {
   photographs as samplePhotographs,
-  printSizes as samplePrintSizes,
   projects as sampleProjects,
 } from '@/data/sampleData';
+import { printSizes as unifiedPrintSizes } from './printSizes';
 import { getSupabasePublic } from './supabase';
-
-// ─── Row shapes from Supabase (snake_case) ───────────────────────────────────
 
 type DbProject = {
   id: string;
@@ -39,11 +34,9 @@ type DbPhotograph = {
   created_at: string;
 };
 
-// ─── Mappers ─────────────────────────────────────────────────────────────────
-
 function mapProject(row: DbProject): Project {
   return {
-    id: row.slug ?? row.id, // use slug as the URL-safe id
+    id: row.slug ?? row.id,
     title: row.title,
     description: row.description,
     coverImageUrl: row.cover_image_url,
@@ -68,15 +61,13 @@ function mapPhotograph(row: DbPhotograph): Photograph {
   };
 }
 
-// ─── Public API ──────────────────────────────────────────────────────────────
-
 export async function getProjects(): Promise<Project[]> {
   const sb = getSupabasePublic();
   if (!sb) return sampleProjects;
 
   const { data, error } = await sb.from('projects').select().order('created_at', { ascending: true });
-  if (error || !data) return sampleProjects;
-  return (data as unknown as DbProject[]).map(mapProject);
+  if (error || !Array.isArray(data)) return sampleProjects;
+  return (data as DbProject[]).map(mapProject);
 }
 
 export async function getPhotographs(): Promise<Photograph[]> {
@@ -84,8 +75,8 @@ export async function getPhotographs(): Promise<Photograph[]> {
   if (!sb) return samplePhotographs;
 
   const { data, error } = await sb.from('photographs').select().order('created_at', { ascending: false });
-  if (error || !data) return samplePhotographs;
-  return (data as unknown as DbPhotograph[]).map(mapPhotograph);
+  if (error || !Array.isArray(data)) return samplePhotographs;
+  return (data as DbPhotograph[]).map(mapPhotograph);
 }
 
 export async function getProjectById(id: string): Promise<Project | undefined> {
@@ -99,33 +90,36 @@ export async function getPhotographsByProject(projectId: string): Promise<Photog
     return samplePhotographs.filter((p) => p.projectId === projectId).slice(0, 12);
   }
 
-  // Resolve slug → uuid if needed
-  const projects = await getProjects();
-  const project = projects.find((p) => p.id === projectId);
-  if (!project) return [];
+  const { data: projectData, error: projectError } = await sb
+    .from('projects')
+    .select('id')
+    .eq('slug', projectId)
+    .single();
+
+  const realId = !projectError && projectData ? (projectData as any).id : projectId;
+
+  // UUID validation check to avoid Postgres error 22P02
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(realId);
+  if (!isUuid) return [];
 
   const { data, error } = await sb
     .from('photographs')
     .select()
-    .eq('project_id', project.id)
+    .eq('project_id', realId)
     .order('created_at', { ascending: true });
 
-  if (error || !data) return [];
-  return (data as unknown as DbPhotograph[]).map(mapPhotograph).slice(0, 12);
+  if (error || !Array.isArray(data)) return [];
+  return (data as DbPhotograph[]).map(mapPhotograph).slice(0, 12);
 }
 
 export async function getPhotographByCode(imageCode: string): Promise<Photograph | undefined> {
   const sb = getSupabasePublic();
   if (!sb) return samplePhotographs.find((p) => p.imageCode === imageCode);
 
-  const { data, error } = await sb.from('photographs').select().eq('image_code', imageCode);
-  if (error || !data || !(data as unknown[]).length) return undefined;
-  return mapPhotograph((data as unknown as DbPhotograph[])[0]);
+  const { data, error } = await sb.from('photographs').select().eq('image_code', imageCode).single();
+  if (error || !data) return undefined;
+  return mapPhotograph(data as DbPhotograph);
 }
 
-// Print sizes remain local — simple reference data, no need for DB round-trip
-export const printSizes: PrintSize[] = samplePrintSizes;
-
-// Re-export sample arrays for static param generation (generateStaticParams).
-// All runtime data fetching uses the async functions above.
+export const printSizes = unifiedPrintSizes;
 export { samplePhotographs as photographs, sampleProjects as projects };

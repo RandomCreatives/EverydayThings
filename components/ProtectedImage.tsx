@@ -34,7 +34,7 @@ export function ProtectedImage({ photo, priority = false, sizes = ARCHIVE_IMAGE_
   return (
     <figure className="group relative mb-4 break-inside-avoid">
       <div className="relative bg-gray-200" style={{ aspectRatio: `${photo.aspectRatio}` }}>
-        <Image
+        <Image onContextMenu={(event) => event.preventDefault()}
           src={photo.imageUrl}
           alt={photo.title}
           fill
@@ -43,7 +43,6 @@ export function ProtectedImage({ photo, priority = false, sizes = ARCHIVE_IMAGE_
           placeholder="blur"
           blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
           draggable={false}
-          onContextMenu={(event) => event.preventDefault()}
           className="select-none object-cover"
         />
         <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-75 group-hover:bg-black/25 group-focus-within:bg-black/25" />

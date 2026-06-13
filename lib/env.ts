@@ -10,34 +10,33 @@ type RuntimeEnv = {
   supabaseUrl?: string;
   supabaseServiceRoleKey?: string;
   supabaseReceiptsBucket: string;
-  // Stripe (legacy / optional)
-  stripeSecretKey?: string;
   // Contact form
   formspreeEndpoint?: string;
   resendApiKey?: string;
   contactToEmail?: string;
-  // Admin
-  adminUploadPassword?: string;
 };
 
 function trim(value: string | undefined) {
   const cleaned = value?.trim();
-  return cleaned ? cleaned : undefined;
+  return cleaned ? (cleaned.startsWith('=') ? cleaned.slice(1) : cleaned) : undefined;
 }
 
 function normalizeSiteUrl() {
-  let explicit = trim(process.env.NEXT_PUBLIC_SITE_URL);
-  if (explicit) {
-    // Robustness: strip leading = if accidentally pasted from env logs
-    explicit = explicit.replace(/^=/, '');
-    // Robustness: ensure protocol
-    if (!explicit.startsWith('http://') && !explicit.startsWith('https://')) {
-      explicit = `https://${explicit}`;
+  const explicit = trim(process.env.NEXT_PUBLIC_SITE_URL);
+  const vercelUrl = trim(process.env.VERCEL_URL);
+
+  // If explicit URL is definitely a placeholder, favor VERCEL_URL.
+  // We exclude 'everydaythings.vercel.app' if it's the actual intended domain.
+  const isPlaceholder = !explicit || explicit.includes('your-domain.com');
+
+  if (explicit && !isPlaceholder) {
+    let url = explicit;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
     }
-    return explicit.replace(/\/$/, '');
+    return url.replace(/\/$/, '');
   }
 
-  const vercelUrl = trim(process.env.VERCEL_URL);
   if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
 
   return 'http://localhost:3000';
@@ -61,11 +60,9 @@ export function getServerEnv(): RuntimeEnv {
     supabaseUrl: trim(process.env.NEXT_PUBLIC_SUPABASE_URL),
     supabaseServiceRoleKey: trim(process.env.SUPABASE_SERVICE_ROLE_KEY),
     supabaseReceiptsBucket: trim(process.env.SUPABASE_RECEIPTS_BUCKET) ?? 'receipts',
-    stripeSecretKey: trim(process.env.STRIPE_SECRET_KEY),
     formspreeEndpoint: trim(process.env.FORMSPREE_ENDPOINT),
     resendApiKey: trim(process.env.RESEND_API_KEY),
     contactToEmail: trim(process.env.CONTACT_TO_EMAIL),
-    adminUploadPassword: trim(process.env.ADMIN_UPLOAD_PASSWORD),
   };
 }
 

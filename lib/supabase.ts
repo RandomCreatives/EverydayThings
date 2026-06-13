@@ -6,7 +6,6 @@
 
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 
-// ── OrderInsert type (matches schema.sql orders table) ────────────────────────
 export type OrderInsert = {
   tx_ref: string;
   provider: string;
@@ -25,7 +24,6 @@ export type OrderInsert = {
   metadata: Record<string, unknown>;
 };
 
-// ── Minimal REST client ───────────────────────────────────────────────────────
 type SupabaseRestClient = {
   from: (table: string) => QueryBuilder;
   storage: StorageClient;
@@ -39,8 +37,8 @@ type QueryBuilder = {
 type FilterBuilder = {
   eq: (column: string, value: string) => FilterBuilder;
   order: (column: string, opts?: { ascending: boolean }) => FilterBuilder;
-  single: () => Promise<{ data: Json | null; error: { message: string } | null }>;
-  then: Promise<{ data: Json[] | null; error: { message: string } | null }>['then'];
+  single: () => Promise<{ data: any | null; error: any | null }>;
+  then: Promise<{ data: any[] | null; error: any | null }>['then'];
 };
 
 type InsertBuilder = {
@@ -48,7 +46,7 @@ type InsertBuilder = {
 };
 
 type InsertSelectBuilder = {
-  single: () => Promise<{ data: Json | null; error: { message: string } | null }>;
+  single: () => Promise<{ data: any | null; error: any | null }>;
 };
 
 type StorageClient = {
@@ -56,8 +54,8 @@ type StorageClient = {
 };
 
 type StorageBucketClient = {
-  upload: (path: string, body: Buffer, opts: { contentType: string; upsert: boolean }) => Promise<{ error: { message: string } | null }>;
-  createSignedUrl: (path: string, expiresIn: number) => Promise<{ data: { signedUrl: string } | null; error: { message: string } | null }>;
+  upload: (path: string, body: any, opts: { contentType: string; upsert: boolean }) => Promise<{ error: any | null }>;
+  createSignedUrl: (path: string, expiresIn: number) => Promise<{ data: { signedUrl: string } | null; error: any | null }>;
 };
 
 function buildRestClient(url: string, key: string): SupabaseRestClient {
@@ -89,18 +87,26 @@ function buildRestClient(url: string, key: string): SupabaseRestClient {
           orderClause = `order=${column}.${opts?.ascending === false ? 'desc' : 'asc'}`;
           return filterBuilder;
         },
-        single() {
-          const fetchUrl = buildQueryUrl(table, filters, orderClause);
-          return fetch(fetchUrl, { headers, next: { revalidate: 60 } })
-            .then((res) => res.json() as Promise<Json[]>)
-            .then(([data]) => ({ data: data ?? null, error: null }))
-            .catch((err: Error) => ({ data: null, error: { message: err.message } }));
+        async single() {
+          try {
+            const fetchUrl = buildQueryUrl(table, filters, orderClause);
+            const res = await fetch(fetchUrl, { headers, next: { revalidate: 60 } });
+            const json = await res.json();
+            if (!res.ok) return { data: null, error: json };
+            const data = Array.isArray(json) ? json[0] : json;
+            return { data: data ?? null, error: null };
+          } catch (err: any) {
+            return { data: null, error: { message: err.message } };
+          }
         },
         then(onfulfilled, onrejected) {
           const fetchUrl = buildQueryUrl(table, filters, orderClause);
           return fetch(fetchUrl, { headers, next: { revalidate: 60 } })
-            .then((res) => res.json() as Promise<Json[]>)
-            .then((data) => ({ data, error: null }))
+            .then(async (res) => {
+              const json = await res.json();
+              if (!res.ok) return { data: null, error: json };
+              return { data: Array.isArray(json) ? json : [json], error: null };
+            })
             .catch((err: Error) => ({ data: null, error: { message: err.message } }))
             .then(onfulfilled, onrejected);
         },
@@ -109,15 +115,20 @@ function buildRestClient(url: string, key: string): SupabaseRestClient {
       const insertBuilder = (data: Record<string, unknown>): InsertBuilder => ({
         select(_columns = '*') {
           return {
-            single() {
-              return fetch(`${url}/rest/v1/${table}?select=*`, {
-                method: 'POST',
-                headers: { ...headers, Prefer: 'return=representation' },
-                body: JSON.stringify(data),
-              })
-                .then((res) => res.json() as Promise<Json[]>)
-                .then(([row]) => ({ data: row ?? null, error: null }))
-                .catch((err: Error) => ({ data: null, error: { message: err.message } }));
+            async single() {
+              try {
+                const res = await fetch(`${url}/rest/v1/${table}?select=*`, {
+                  method: 'POST',
+                  headers: { ...headers, Prefer: 'return=representation' },
+                  body: JSON.stringify(data),
+                });
+                const json = await res.json();
+                if (!res.ok) return { data: null, error: json };
+                const row = Array.isArray(json) ? json[0] : json;
+                return { data: row ?? null, error: null };
+              } catch (err: any) {
+                return { data: null, error: { message: err.message } };
+              }
             },
           };
         },
@@ -133,34 +144,39 @@ function buildRestClient(url: string, key: string): SupabaseRestClient {
       from(bucket: string): StorageBucketClient {
         return {
           async upload(path, body, opts) {
-            const res = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
-              method: 'POST',
-              headers: {
-                apikey: key,
-                Authorization: `Bearer ${key}`,
-                'Content-Type': opts.contentType,
-                'x-upsert': String(opts.upsert),
-              },
-              body,
-            });
-            if (!res.ok) {
-              const msg = await res.text();
-              return { error: { message: msg } };
+            try {
+              const res = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
+                method: 'POST',
+                headers: {
+                  apikey: key,
+                  Authorization: `Bearer ${key}`,
+                  'Content-Type': opts.contentType,
+                  'x-upsert': String(opts.upsert),
+                },
+                body,
+              });
+              if (!res.ok) {
+                const msg = await res.text();
+                return { error: { message: msg } };
+              }
+              return { error: null };
+            } catch (err: any) {
+              return { error: { message: err.message } };
             }
-            return { error: null };
           },
           async createSignedUrl(path, expiresIn) {
-            const res = await fetch(`${url}/storage/v1/object/sign/${bucket}/${path}`, {
-              method: 'POST',
-              headers: { ...headers },
-              body: JSON.stringify({ expiresIn }),
-            });
-            if (!res.ok) {
-              const msg = await res.text();
-              return { data: null, error: { message: msg } };
+            try {
+              const res = await fetch(`${url}/storage/v1/object/sign/${bucket}/${path}`, {
+                method: 'POST',
+                headers: { ...headers },
+                body: JSON.stringify({ expiresIn }),
+              });
+              const json = await res.json();
+              if (!res.ok) return { data: null, error: json };
+              return { data: { signedUrl: json.signedURL || json.signedUrl }, error: null };
+            } catch (err: any) {
+              return { data: null, error: { message: err.message } };
             }
-            const json = (await res.json()) as { signedURL: string };
-            return { data: { signedUrl: json.signedURL }, error: null };
           },
         };
       },
@@ -182,5 +198,4 @@ export function getSupabaseServiceRole(): SupabaseRestClient | null {
   return buildRestClient(url, key);
 }
 
-// Alias used by lib/orders.ts
 export const getSupabaseServiceClient = getSupabaseServiceRole;

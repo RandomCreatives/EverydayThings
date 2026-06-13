@@ -59,7 +59,7 @@ function GridThumb({
         onClick={() => onSelect(photo)}
         aria-label={`Expand ${photo.title}`}
       >
-        <Image
+        <Image onContextMenu={(event) => event.preventDefault()}
           src={photo.imageUrl}
           alt={photo.title}
           fill
@@ -68,7 +68,6 @@ function GridThumb({
           placeholder="blur"
           blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
           draggable={false}
-          onContextMenu={(e) => e.preventDefault()}
           className="select-none object-cover"
         />
         {/* Hover overlay */}

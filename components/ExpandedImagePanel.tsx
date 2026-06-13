@@ -158,9 +158,8 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
           <div
             className="relative w-full bg-gray-200"
             style={{ aspectRatio: `${photo.aspectRatio}` }}
-            onContextMenu={(e) => e.preventDefault()}
           >
-            <Image
+            <Image onContextMenu={(event) => event.preventDefault()}
               src={photo.imageUrl}
               alt={photo.title}
               fill

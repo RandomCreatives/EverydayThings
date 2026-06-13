@@ -73,3 +73,131 @@ Module build failed: Error: ENOENT: no such file or directory, open '/app/node_m
 Import trace for requested module:
 ./node_modules/process/browser.js
 ./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ✓ Compiled /api/health in 431ms (440 modules)
+ ○ Compiling /_error ...
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ GET /api/health 500 in 7417ms
+ GET /api/health 500 in 37ms
+ GET /api/health 500 in 27ms
+ GET /api/health 500 in 32ms
+ GET /api/health 500 in 24ms
+ GET /api/health 500 in 23ms
+ GET /api/health 500 in 22ms
+ GET /api/health 500 in 23ms
+ GET /api/health 500 in 31ms
+ GET /api/health 500 in 28ms
+ GET /api/health 500 in 21ms
+ GET /api/health 500 in 22ms
+ GET /api/health 500 in 54ms
+ GET /api/health 500 in 35ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 24ms
+ GET /api/health 500 in 26ms
+ GET /api/health 500 in 18ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 23ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 31ms
+ GET /api/health 500 in 23ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 32ms
+ GET /api/health 500 in 27ms
+ GET /api/health 500 in 25ms
+ GET /api/health 500 in 24ms
+ GET /api/health 500 in 28ms
+ GET /api/health 500 in 23ms
+ GET /api/health 500 in 22ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 21ms
+ GET /api/health 500 in 23ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 32ms
+ GET /api/health 500 in 22ms
+ GET /api/health 500 in 24ms
+ GET /api/health 500 in 21ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 26ms
+ GET /api/health 500 in 18ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 29ms
+ GET /api/health 500 in 32ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 18ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 21ms
+ GET /api/health 500 in 19ms
+ GET /api/health 500 in 21ms
+ GET /api/health 500 in 21ms
+ GET /api/health 500 in 18ms
+ GET /api/health 500 in 20ms
+ GET /api/health 500 in 26ms
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js
+ ⨯ ./node_modules/process/browser.js
+Module build failed: Error: ENOENT: no such file or directory, open '/app/node_modules/process/browser.js'
+
+Import trace for requested module:
+./node_modules/process/browser.js
+./node_modules/next/dist/compiled/next-devtools/index.js

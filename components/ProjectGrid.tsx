@@ -11,7 +11,7 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
       {projects.map((project, index) => (
         <Link key={project.id} href={`/projects/${project.id}`} className="group block">
           <div className="relative mb-2 aspect-[4/3] w-full bg-gray-200">
-            <Image
+            <Image onContextMenu={(event) => event.preventDefault()}
               src={project.coverImageUrl}
               alt=""
               fill
@@ -19,7 +19,6 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
               sizes={PROJECT_COVER_IMAGE_SIZES}
               placeholder="blur"
               blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
-              onContextMenu={(event) => event.preventDefault()}
               className="select-none object-cover"
               draggable={false}
             />

@@ -97,14 +97,13 @@ export function PrintDrawer() {
               className="relative mb-3 w-full bg-gray-200"
               style={{ aspectRatio: `${selectedPhoto.aspectRatio}` }}
             >
-              <Image
+              <Image onContextMenu={(event) => event.preventDefault()}
                 src={selectedPhoto.imageUrl}
                 alt={selectedPhoto.title}
                 fill
                 sizes={DRAWER_IMAGE_SIZES}
                 placeholder="blur"
                 blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
-                onContextMenu={(e) => e.preventDefault()}
                 className="select-none object-cover"
                 draggable={false}
               />
