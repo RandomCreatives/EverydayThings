@@ -91,7 +91,7 @@ async function uploadReceipt(input: ReceiptInput) {
   if (error) throw new Error(`Receipt upload failed: ${error.message}`);
 
   const { data, error: signedUrlError } = await supabase.storage.from(env.supabaseReceiptsBucket).createSignedUrl(path, 60 * 60 * 24 * 14);
-  if (signedUrlError) throw new Error(`Receipt signed URL failed: ${signedUrlError.message}`);
+  if (signedUrlError || !data) throw new Error(`Receipt signed URL failed: ${signedUrlError?.message ?? 'Unknown error'}`);
 
   return data.signedUrl;
 }
