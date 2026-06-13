@@ -4,6 +4,7 @@ export interface Photograph {
   imageUrl: string; // WebP, optimized 72 DPI, 2000px long edge max
   aspectRatio: number; // width / height for masonry calculations
   title: string;
+  description?: string; // Short caption shown in expanded view
   location: string;
   category: string;
   isPrintAvailable: boolean;

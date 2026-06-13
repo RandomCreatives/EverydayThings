@@ -7,7 +7,7 @@ import { getServerEnv } from '@/lib/env';
 const env = getServerEnv();
 
 export const metadata: Metadata = {
-  title: 'Minimal Photo Archive',
+  title: 'Everyday Things',
   description: 'A monochrome photography portfolio, archive, and fine art print shop.',
   metadataBase: new URL(env.siteUrl)
 };

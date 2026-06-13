@@ -2,12 +2,18 @@ type RuntimeEnv = {
   nodeEnv: 'development' | 'test' | 'production';
   siteUrl: string;
   isProduction: boolean;
-  stripeSecretKey?: string;
-  stripeWebhookSecret?: string;
+  // Chapa
+  chapaSecretKey?: string;
+  chapaWebhookSecret?: string;
+  chapaVerifyBaseUrl: string;
+  // Supabase
+  supabaseUrl?: string;
+  supabaseServiceRoleKey?: string;
+  supabaseReceiptsBucket: string;
+  // Contact form
   formspreeEndpoint?: string;
   resendApiKey?: string;
   contactToEmail?: string;
-  adminUploadPassword?: string;
 };
 
 function trim(value: string | undefined) {
@@ -16,8 +22,16 @@ function trim(value: string | undefined) {
 }
 
 function normalizeSiteUrl() {
-  const explicit = trim(process.env.NEXT_PUBLIC_SITE_URL);
-  if (explicit) return explicit.replace(/\/$/, '');
+  let explicit = trim(process.env.NEXT_PUBLIC_SITE_URL);
+  if (explicit) {
+    // Robustness: strip leading = if accidentally pasted from env logs
+    explicit = explicit.replace(/^=/, '');
+    // Robustness: ensure protocol
+    if (!explicit.startsWith('http://') && !explicit.startsWith('https://')) {
+      explicit = `https://${explicit}`;
+    }
+    return explicit.replace(/\/$/, '');
+  }
 
   const vercelUrl = trim(process.env.VERCEL_URL);
   if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
@@ -26,18 +40,26 @@ function normalizeSiteUrl() {
 }
 
 export function getServerEnv(): RuntimeEnv {
-  const nodeEnv = process.env.NODE_ENV === 'production' ? 'production' : process.env.NODE_ENV === 'test' ? 'test' : 'development';
+  const nodeEnv =
+    process.env.NODE_ENV === 'production'
+      ? 'production'
+      : process.env.NODE_ENV === 'test'
+        ? 'test'
+        : 'development';
 
   return {
     nodeEnv,
     isProduction: nodeEnv === 'production',
     siteUrl: normalizeSiteUrl(),
-    stripeSecretKey: trim(process.env.STRIPE_SECRET_KEY),
-    stripeWebhookSecret: trim(process.env.STRIPE_WEBHOOK_SECRET),
+    chapaSecretKey: trim(process.env.CHAPA_SECRET_KEY),
+    chapaWebhookSecret: trim(process.env.CHAPA_WEBHOOK_SECRET),
+    chapaVerifyBaseUrl: trim(process.env.CHAPA_VERIFY_BASE_URL) ?? 'https://api.chapa.co/v1/transaction/verify',
+    supabaseUrl: trim(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    supabaseServiceRoleKey: trim(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    supabaseReceiptsBucket: trim(process.env.SUPABASE_RECEIPTS_BUCKET) ?? 'receipts',
     formspreeEndpoint: trim(process.env.FORMSPREE_ENDPOINT),
     resendApiKey: trim(process.env.RESEND_API_KEY),
     contactToEmail: trim(process.env.CONTACT_TO_EMAIL),
-    adminUploadPassword: trim(process.env.ADMIN_UPLOAD_PASSWORD)
   };
 }
 
@@ -46,4 +68,12 @@ export function isConfiguredSecret(value: string | undefined, prefix?: string): 
   if (value.includes('replace_me')) return false;
   if (prefix && !value.startsWith(prefix)) return false;
   return true;
+}
+
+export function hasSupabaseReadEnv(env: RuntimeEnv): boolean {
+  return Boolean(env.supabaseUrl && !env.supabaseUrl.includes('replace-me'));
+}
+
+export function hasSupabaseWriteEnv(env: RuntimeEnv): boolean {
+  return hasSupabaseReadEnv(env) && Boolean(env.supabaseServiceRoleKey);
 }

@@ -1,10 +1,5 @@
-import type { Photograph, PrintSize, Project } from '@/lib/types';
+import type { Photograph, Project } from '@/lib/types';
 
-export const printSizes: PrintSize[] = [
-  { id: 'small', label: 'Small', dimensions: '12 × 16 in', priceCents: 18000 },
-  { id: 'medium', label: 'Medium', dimensions: '18 × 24 in', priceCents: 32000 },
-  { id: 'large', label: 'Large', dimensions: '24 × 36 in', priceCents: 54000 }
-];
 
 export const projects: Project[] = [
   {
@@ -40,6 +35,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-001.jpg',
     aspectRatio: 0.72,
     title: 'Awning Study',
+    description: 'Tarpaulin awnings stretched over a morning stall, light diffused through pale canvas. The geometry of shade as temporary architecture.',
     location: 'Mesa Market, Addis Ababa',
     category: 'market',
     isPrintAvailable: true,
@@ -53,6 +49,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-002.jpg',
     aspectRatio: 1.42,
     title: 'Wall Shade',
+    description: 'A long whitewashed wall splits the frame into shadow and open sky. A figure at the edge makes the scale legible.',
     location: 'Bole Road Shadows',
     category: 'street',
     isPrintAvailable: true,
@@ -66,6 +63,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-003.jpg',
     aspectRatio: 0.64,
     title: 'Crate Stack',
+    description: 'Wooden crates stacked before the market opens, their repeated form creating a quiet rhythm against the concrete floor.',
     location: 'Arat Kilo Morning',
     category: 'market',
     isPrintAvailable: true,
@@ -79,6 +77,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-004.jpg',
     aspectRatio: 1.18,
     title: 'Checkpoint Shade',
+    description: 'A corrugated metal roof over a bus stop, mid-afternoon. The shade draws a hard line across the waiting zone.',
     location: 'Piassa Bus Stop',
     category: 'roadside',
     isPrintAvailable: true,
@@ -92,6 +91,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-005.jpg',
     aspectRatio: 0.82,
     title: 'Laundry Line',
+    description: 'Clothes on a line strung between buildings, midday light flattening their form into silhouette against a pale sky.',
     location: 'Kazanchis Midday',
     category: 'street',
     isPrintAvailable: false,
@@ -104,6 +104,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-006.jpg',
     aspectRatio: 1.62,
     title: 'Taxi Rank',
+    description: 'A row of minibuses at a city crossing, drivers leaning, passengers dispersing. The ordinary choreography of public transit.',
     location: 'Mexico Square Crossing',
     category: 'roadside',
     isPrintAvailable: true,
@@ -117,6 +118,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-007.jpg',
     aspectRatio: 0.68,
     title: 'Table Edge',
+    description: 'The worn corner of a market table, threads of cloth hanging over its edge. Surface detail as evidence of repeated use.',
     location: 'Shiro Meda Weavers',
     category: 'market',
     isPrintAvailable: true,
@@ -130,6 +132,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-008.jpg',
     aspectRatio: 1.31,
     title: 'Painted Gate',
+    description: 'A compound gate with layered paint, padlock, and handwritten number. An ordinary threshold rendered in close focus.',
     location: 'Lideta Afternoon',
     category: 'street',
     isPrintAvailable: true,
@@ -143,6 +146,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-009.jpg',
     aspectRatio: 0.95,
     title: 'Shelter Frame',
+    description: 'A makeshift roof of poles and plastic over a phone charging stall. Infrastructure assembled from available parts.',
     location: 'Merkato Phone Stalls',
     category: 'roadside',
     isPrintAvailable: true,
@@ -156,6 +160,7 @@ export const photographs: Photograph[] = [
     imageUrl: '/images/archive/aa-mono-010.jpg',
     aspectRatio: 0.59,
     title: 'Morning Inventory',
+    description: 'A trader counting stock in early light, sacks arranged by size along the wall. The quiet logic of daily preparation.',
     location: 'Saris Early Trade',
     category: 'market',
     isPrintAvailable: true,

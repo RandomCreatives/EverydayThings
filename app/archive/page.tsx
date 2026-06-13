@@ -1,11 +1,13 @@
 import { MasonryArchive } from '@/components/MasonryArchive';
-import { photographs } from '@/lib/data';
+import { getPhotographs } from '@/lib/data';
 
 export const metadata = {
-  title: 'Archive | Minimal Photo Archive'
+  title: 'Archive | Everyday Things'
 };
 
-export default function ArchivePage() {
+export default async function ArchivePage() {
+  const photographs = await getPhotographs();
+
   return (
     <main className="mx-auto max-w-[1800px] px-3 py-4 md:px-5">
       <div className="mb-4 flex items-end justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-gray-500">

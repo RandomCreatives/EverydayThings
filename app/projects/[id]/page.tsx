@@ -13,17 +13,17 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProjectPageProps) {
   const { id } = await params;
-  const project = getProjectById(id);
-  return { title: project ? `${project.title} | Minimal Photo Archive` : 'Project' };
+  const project = await getProjectById(id);
+  return { title: project ? `${project.title} | Everyday Things` : 'Project' };
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { id } = await params;
-  const project = getProjectById(id);
+  const project = await getProjectById(id);
 
   if (!project) notFound();
 
-  const sequence = getPhotographsByProject(project.id);
+  const sequence = await getPhotographsByProject(project.id);
 
   return (
     <main className="mx-auto max-w-5xl px-3 py-4 md:px-5">
