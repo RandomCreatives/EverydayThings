@@ -2,11 +2,17 @@ type RuntimeEnv = {
   nodeEnv: 'development' | 'test' | 'production';
   siteUrl: string;
   isProduction: boolean;
-  stripeSecretKey?: string;
-  stripeWebhookSecret?: string;
+  // Chapa (replaces Stripe)
+  chapaSecretKey?: string;
+  chapaWebhookSecret?: string;
+  // Supabase
+  supabaseUrl?: string;
+  supabaseServiceRoleKey?: string;
+  // Contact form
   formspreeEndpoint?: string;
   resendApiKey?: string;
   contactToEmail?: string;
+  // Admin
   adminUploadPassword?: string;
 };
 
@@ -26,18 +32,25 @@ function normalizeSiteUrl() {
 }
 
 export function getServerEnv(): RuntimeEnv {
-  const nodeEnv = process.env.NODE_ENV === 'production' ? 'production' : process.env.NODE_ENV === 'test' ? 'test' : 'development';
+  const nodeEnv =
+    process.env.NODE_ENV === 'production'
+      ? 'production'
+      : process.env.NODE_ENV === 'test'
+        ? 'test'
+        : 'development';
 
   return {
     nodeEnv,
     isProduction: nodeEnv === 'production',
     siteUrl: normalizeSiteUrl(),
-    stripeSecretKey: trim(process.env.STRIPE_SECRET_KEY),
-    stripeWebhookSecret: trim(process.env.STRIPE_WEBHOOK_SECRET),
+    chapaSecretKey: trim(process.env.CHAPA_SECRET_KEY),
+    chapaWebhookSecret: trim(process.env.CHAPA_WEBHOOK_SECRET),
+    supabaseUrl: trim(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    supabaseServiceRoleKey: trim(process.env.SUPABASE_SERVICE_ROLE_KEY),
     formspreeEndpoint: trim(process.env.FORMSPREE_ENDPOINT),
     resendApiKey: trim(process.env.RESEND_API_KEY),
     contactToEmail: trim(process.env.CONTACT_TO_EMAIL),
-    adminUploadPassword: trim(process.env.ADMIN_UPLOAD_PASSWORD)
+    adminUploadPassword: trim(process.env.ADMIN_UPLOAD_PASSWORD),
   };
 }
 

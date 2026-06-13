@@ -7,11 +7,13 @@ import type { Photograph } from '@/lib/types';
 import { ExpandedImagePanel } from './ExpandedImagePanel';
 import { usePrintDrawer } from './PrintDrawerProvider';
 
+// Nav is 44px — keep in sync with Navigation.tsx inline style
+const NAV_HEIGHT = 44;
+
 type Props = {
   photographs: Photograph[];
 };
 
-// Thumbnail used inside the reshuffled grid (right side)
 function GridThumb({
   photo,
   index,
@@ -22,16 +24,39 @@ function GridThumb({
   onSelect: (photo: Photograph) => void;
 }) {
   const { openPrintDrawer } = usePrintDrawer();
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('savedImageCodes') ?? '[]') as string[];
+      setIsSaved(saved.includes(photo.imageCode));
+    } catch {
+      // ignore
+    }
+  }, [photo.imageCode]);
+
+  function toggleSaved(e: React.MouseEvent | React.KeyboardEvent) {
+    e.stopPropagation();
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('savedImageCodes') ?? '[]') as string[];
+      const next = saved.includes(photo.imageCode)
+        ? saved.filter((c) => c !== photo.imageCode)
+        : [...saved, photo.imageCode];
+      window.localStorage.setItem('savedImageCodes', JSON.stringify(next));
+      setIsSaved(next.includes(photo.imageCode));
+    } catch {
+      // ignore
+    }
+  }
 
   return (
-    <figure className="group relative mb-3 break-inside-avoid cursor-pointer">
-      <div
-        className="relative bg-gray-200"
+    <figure className="group relative mb-3 break-inside-avoid">
+      {/* Clickable image wrapper — proper button for a11y */}
+      <button
+        type="button"
+        className="relative block w-full bg-gray-200 text-left"
         style={{ aspectRatio: `${photo.aspectRatio}` }}
         onClick={() => onSelect(photo)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && onSelect(photo)}
         aria-label={`Expand ${photo.title}`}
       >
         <Image
@@ -47,18 +72,40 @@ function GridThumb({
           className="select-none object-cover"
         />
         {/* Hover overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-75 group-hover:bg-black/20" />
+        <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-75 group-hover:bg-black/20 group-focus-within:bg-black/20" />
+
+        {/* Save toggle */}
+        <span
+          role="button"
+          tabIndex={0}
+          className="absolute left-2 top-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white opacity-0 transition-opacity duration-75 group-hover:opacity-100 group-focus-within:opacity-100"
+          onClick={toggleSaved}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleSaved(e)}
+          aria-label={isSaved ? 'Unsave image' : 'Save image'}
+        >
+          {isSaved ? '[ SAVED ]' : '[ SAVE ]'}
+        </span>
+
         {/* Print button */}
         {photo.isPrintAvailable && (
-          <button
-            type="button"
-            className="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white opacity-0 transition-opacity duration-75 group-hover:opacity-100"
+          <span
+            role="button"
+            tabIndex={0}
+            className="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white opacity-0 transition-opacity duration-75 group-hover:opacity-100 group-focus-within:opacity-100"
             onClick={(e) => { e.stopPropagation(); openPrintDrawer(photo); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                openPrintDrawer(photo);
+              }
+            }}
+            aria-label={`Order print of ${photo.title}`}
           >
             [ PRINT ]
-          </button>
+          </span>
         )}
-      </div>
+      </button>
+
       <figcaption className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-gray-500">
         {photo.location}
       </figcaption>
@@ -75,7 +122,7 @@ export function MasonryArchive({ photographs }: Props) {
 
   const handleClose = useCallback(() => setSelected(null), []);
 
-  // Read ?image= from URL on mount to support shared links
+  // Support shared links: /archive?image=AA-MONO-001
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('image');
@@ -85,32 +132,28 @@ export function MasonryArchive({ photographs }: Props) {
     }
   }, [photographs]);
 
-  // Remaining photos excluding the selected one
-  const rest = selected
-    ? photographs.filter((p) => p.id !== selected.id)
-    : photographs;
+  const rest = selected ? photographs.filter((p) => p.id !== selected.id) : photographs;
 
   if (!selected) {
-    // Default masonry — no selection
     return (
       <section className="columns-2 gap-3 md:columns-3 md:gap-4 xl:columns-4 2xl:columns-5">
         {photographs.map((photo, index) => (
-          <GridThumb
-            key={photo.id}
-            photo={photo}
-            index={index}
-            onSelect={handleSelect}
-          />
+          <GridThumb key={photo.id} photo={photo} index={index} onSelect={handleSelect} />
         ))}
       </section>
     );
   }
 
-  // Expanded layout — left panel + reshuffled grid
   return (
     <div className="flex gap-4 md:gap-6">
-      {/* Left — expanded image + detail */}
-      <aside className="w-full md:w-[640px] lg:w-[760px] xl:w-[860px] shrink-0 md:sticky md:top-[52px] md:max-h-[calc(100vh-60px)] md:overflow-y-auto">
+      {/* Left — sticky expanded panel */}
+      <aside
+        className="w-full md:w-[640px] lg:w-[760px] xl:w-[860px] shrink-0 md:sticky md:overflow-y-auto"
+        style={{
+          top: NAV_HEIGHT,
+          maxHeight: `calc(100dvh - ${NAV_HEIGHT}px)`,
+        }}
+      >
         <ExpandedImagePanel photo={selected} onClose={handleClose} />
       </aside>
 
@@ -118,12 +161,7 @@ export function MasonryArchive({ photographs }: Props) {
       <section className="hidden md:block flex-1 min-w-0">
         <div className="columns-2 gap-3 lg:columns-3 lg:gap-4">
           {rest.map((photo, index) => (
-            <GridThumb
-              key={photo.id}
-              photo={photo}
-              index={index}
-              onSelect={handleSelect}
-            />
+            <GridThumb key={photo.id} photo={photo} index={index} onSelect={handleSelect} />
           ))}
         </div>
       </section>

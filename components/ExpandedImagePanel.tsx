@@ -163,7 +163,7 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
               src={photo.imageUrl}
               alt={photo.title}
               fill
-              sizes="(max-width: 768px) 100vw, 30vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 28vw, 470px"
               placeholder="blur"
               blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
               draggable={false}
@@ -248,7 +248,7 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
               )}
               <ul className="mb-4 grid gap-2">
                 {comments.map((c, i) => (
-                  <li key={i} className="border-l-2 border-gray-200 pl-2 text-xs leading-relaxed text-gray-700">
+                  <li key={`${i}-${c.slice(0, 12)}`} className="border-l-2 border-gray-200 pl-2 text-xs leading-relaxed text-gray-700">
                     {c}
                   </li>
                 ))}
