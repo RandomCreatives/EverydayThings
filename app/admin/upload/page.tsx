@@ -2,10 +2,10 @@ import { cookies } from 'next/headers';
 import { AdminUploadGate } from '@/components/admin/AdminUploadGate';
 import { AdminUploadPanel } from '@/components/admin/AdminUploadPanel';
 import { ADMIN_UPLOAD_COOKIE, isAdminUploadConfigured, verifyAdminUploadToken } from '@/lib/adminAuth';
-import { projects } from '@/lib/data';
+import { getProjects } from '@/lib/data';
 
 export const metadata = {
-  title: 'Local Upload | Minimal Photo Archive',
+  title: 'Upload | Everyday Things',
   robots: { index: false, follow: false }
 };
 
@@ -20,6 +20,9 @@ export default async function AdminUploadPage() {
   if (!isConfigured || !isAuthenticated) {
     return <AdminUploadGate isDisabled={!isConfigured} />;
   }
+
+  // Fetch real projects from Supabase (falls back to sampleData if not configured)
+  const projects = await getProjects();
 
   return <AdminUploadPanel projects={projects} />;
 }

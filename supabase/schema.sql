@@ -94,3 +94,24 @@ create policy "Public print sizes are readable"
 -- Orders: insert via service role only (server-side API), no direct client reads
 create policy "Service role manages orders"
   on public.orders using (false);  -- blocked for anon; server uses service_role key
+
+-- ─────────────────────────────────────────────
+-- Storage bucket for photographs
+-- Run this in Supabase Dashboard → SQL Editor
+-- OR create the bucket manually:
+--   Dashboard → Storage → New bucket
+--   Name: photographs   Public: ON
+-- ─────────────────────────────────────────────
+insert into storage.buckets (id, name, public)
+values ('photographs', 'photographs', true)
+on conflict (id) do nothing;
+
+-- Allow public read of all images
+create policy "Public photograph images are readable"
+  on storage.objects for select
+  using (bucket_id = 'photographs');
+
+-- Only service role can upload (enforced by API route auth)
+create policy "Service role uploads photographs"
+  on storage.objects for insert
+  with check (bucket_id = 'photographs');
