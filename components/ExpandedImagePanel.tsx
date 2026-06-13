@@ -158,8 +158,9 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
           <div
             className="relative w-full bg-gray-200"
             style={{ aspectRatio: `${photo.aspectRatio}` }}
+            onContextMenu={(e) => e.preventDefault()}
           >
-            <Image onContextMenu={(event) => event.preventDefault()}
+            <Image
               src={photo.imageUrl}
               alt={photo.title}
               fill
@@ -167,7 +168,6 @@ export function ExpandedImagePanel({ photo, onClose }: Props) {
               placeholder="blur"
               blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
               draggable={false}
-              onContextMenu={(e) => e.preventDefault()}
               className="select-none object-cover"
               priority
             />

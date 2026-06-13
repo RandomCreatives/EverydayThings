@@ -5,12 +5,12 @@
  * falls back to the local sampleData arrays so the app always renders.
  */
 
-import type { Photograph, Project } from './types';
+import type { Photograph, PrintSize, Project } from './types';
 import {
   photographs as samplePhotographs,
+  printSizes as samplePrintSizes,
   projects as sampleProjects,
 } from '@/data/sampleData';
-import { printSizes as unifiedPrintSizes } from './printSizes';
 import { getSupabasePublic } from './supabase';
 
 // ─── Row shapes from Supabase (snake_case) ───────────────────────────────────
@@ -124,7 +124,7 @@ export async function getPhotographByCode(imageCode: string): Promise<Photograph
 }
 
 // Print sizes remain local — simple reference data, no need for DB round-trip
-export const printSizes = unifiedPrintSizes;
+export const printSizes: PrintSize[] = samplePrintSizes;
 
 // Re-export sample arrays for static param generation (generateStaticParams).
 // All runtime data fetching uses the async functions above.

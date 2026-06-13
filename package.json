@@ -17,7 +17,8 @@
     "next": "^15.1.6",
     "pdfkit": "^0.15.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sanity": "^3.99.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",

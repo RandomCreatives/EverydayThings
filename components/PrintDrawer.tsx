@@ -104,7 +104,7 @@ export function PrintDrawer() {
                 sizes={DRAWER_IMAGE_SIZES}
                 placeholder="blur"
                 blurDataURL={MUTED_GRAY_BLUR_DATA_URL}
-                onContextMenu={(event) => event.preventDefault()}
+                onContextMenu={(e) => e.preventDefault()}
                 className="select-none object-cover"
                 draggable={false}
               />

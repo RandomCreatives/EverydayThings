@@ -141,7 +141,7 @@ function buildRestClient(url: string, key: string): SupabaseRestClient {
                 'Content-Type': opts.contentType,
                 'x-upsert': String(opts.upsert),
               },
-              body: body as any, // Cast Buffer to any to avoid fetch type error
+              body,
             });
             if (!res.ok) {
               const msg = await res.text();

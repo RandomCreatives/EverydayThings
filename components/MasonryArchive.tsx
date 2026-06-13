@@ -59,7 +59,7 @@ function GridThumb({
         onClick={() => onSelect(photo)}
         aria-label={`Expand ${photo.title}`}
       >
-        <Image onContextMenu={(event) => event.preventDefault()}
+        <Image
           src={photo.imageUrl}
           alt={photo.title}
           fill
