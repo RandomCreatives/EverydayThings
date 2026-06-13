@@ -3,6 +3,7 @@ import './globals.css';
 import { Navigation } from '@/components/Navigation';
 import { PrintDrawerProvider } from '@/components/PrintDrawerProvider';
 import { getServerEnv } from '@/lib/env';
+import { Analytics } from '@vercel/analytics/next';
 
 const env = getServerEnv();
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Navigation />
           {children}
         </PrintDrawerProvider>
+        <Analytics />
       </body>
     </html>
   );
